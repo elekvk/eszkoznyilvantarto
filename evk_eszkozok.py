@@ -49,6 +49,12 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.lista.heading("kategoria", text="Kategória")
         self.lista.pack(fill="both", expand=True, padx=10, pady=10)
 
+        ttk.Button(
+            self,
+            text="Kijelölt eszköz törlése",
+            command=self.evk_eszkoz_torlese
+        ).pack(pady=(0, 10))
+
     def evk_eszkoz_hozzaadas(self):
         nev = self.nev_mezo.get().strip()
         kategoria = self.kategoria_mezo.get().strip()
@@ -79,3 +85,28 @@ class EVKEszkozNyilvantarto(tk.Tk):
 
         for eszkoz in eszkozok:
             self.lista.insert("", tk.END, values=eszkoz)
+
+    def evk_eszkoz_torlese(self):
+        kijelolt = self.lista.selection()
+
+        if not kijelolt:
+            messagebox.showwarning(
+                "Nincs kijelölés",
+                "Előbb jelölj ki egy eszközt a listában!"
+            )
+            return
+
+        eszkoz = self.lista.item(kijelolt[0], "values")
+
+        biztos = messagebox.askyesno(
+            "Törlés megerősítése",
+            f"Biztosan törlöd ezt az eszközt: {eszkoz[1]}?"
+        )
+
+        if biztos:
+            self.kapcsolat.execute(
+                "DELETE FROM eszkozok WHERE id = ?",
+                (eszkoz[0],)
+            )
+            self.kapcsolat.commit()
+            self.evk_lista_frissitese()
