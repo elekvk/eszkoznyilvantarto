@@ -54,6 +54,12 @@ class EVKEszkozNyilvantarto(tk.Tk):
             command=self.evk_eszkoz_hozzaadas
         ).grid(row=0, column=4, padx=5)
 
+        ttk.Button(
+            beviteli_sor,
+            text="Módosítás",
+            command=self.evk_eszkoz_modositasa
+        ).grid(row=1, column=4, pady=5)
+
         self.lista = ttk.Treeview(
             eszkoz_frame,
             columns=("id", "nev", "kategoria"),
@@ -63,6 +69,10 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.lista.heading("id", text="Azonosító")
         self.lista.heading("nev", text="Eszköz neve")
         self.lista.heading("kategoria", text="Kategória")
+        self.lista.bind(
+            "<<TreeviewSelect>>",
+            self.evk_kijelolt_eszkoz_betoltese
+        )
         self.lista.pack(fill="both", expand=True, pady=10)
 
         ttk.Button(
@@ -220,3 +230,43 @@ class EVKEszkozNyilvantarto(tk.Tk):
 
         for bejegyzes in bejegyzesek:
             self.karb_lista.insert("", tk.END, values=bejegyzes)
+
+    def evk_kijelolt_eszkoz_betoltese(self, event=None):
+        kijelolt = self.lista.selection()
+
+        if kijelolt:
+            eszkoz = self.lista.item(kijelolt[0], "values")
+            self.nev_mezo.delete(0, tk.END)
+            self.nev_mezo.insert(0, eszkoz[1])
+            self.kategoria_mezo.delete(0, tk.END)
+            self.kategoria_mezo.insert(0, eszkoz[2])
+
+    def evk_eszkoz_modositasa(self):
+        kijelolt = self.lista.selection()
+
+        if not kijelolt:
+            messagebox.showwarning(
+                "Nincs kijelölés",
+                "Előbb jelölj ki egy eszközt a módosításhoz!"
+            )
+            return
+
+        nev = self.nev_mezo.get().strip()
+        kategoria = self.kategoria_mezo.get().strip()
+
+        if not nev or not kategoria:
+            messagebox.showwarning(
+                "Hiányzó adat",
+                "Az eszköz neve és kategóriája nem maradhat üresen!"
+            )
+            return
+
+        eszkoz = self.lista.item(kijelolt[0], "values")
+        self.kapcsolat.execute(
+            "UPDATE eszkozok SET nev = ?, kategoria = ? WHERE id = ?",
+            (nev, kategoria, eszkoz[0])
+        )
+        self.kapcsolat.commit()
+        self.evk_lista_frissitese()
+        self.nev_mezo.delete(0, tk.END)
+        self.kategoria_mezo.delete(0, tk.END)
