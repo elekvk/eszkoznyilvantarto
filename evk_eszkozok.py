@@ -1,14 +1,18 @@
 import sqlite3
 import tkinter as tk
-from tkinter import ttk, messagebox
+from datetime import date, datetime
+from tkinter import messagebox, ttk
 
 
 class EVKEszkozNyilvantarto(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Eszköznyilvántartó")
-        self.geometry("600x400")
+        self.title("Eszköznyilvántartó és karbantartási napló")
+        self.geometry("850x700")
+
         self.kapcsolat = sqlite3.connect("eszkozok.db")
+        self.kapcsolat.execute("PRAGMA foreign_keys = ON")
+
         self.evk_adatbazis_elokeszitese()
         self.evk_felulet_elkeszitese()
         self.evk_lista_frissitese()
@@ -19,10 +23,21 @@ class EVKEszkozNyilvantarto(tk.Tk):
             "(id INTEGER PRIMARY KEY AUTOINCREMENT, "
             "nev TEXT NOT NULL, kategoria TEXT NOT NULL)"
         )
+        self.kapcsolat.execute(
+            "CREATE TABLE IF NOT EXISTS karbantartas "
+            "(id INTEGER PRIMARY KEY AUTOINCREMENT, "
+            "eszkoz_id INTEGER NOT NULL, datum TEXT NOT NULL, "
+            "leiras TEXT NOT NULL, "
+            "FOREIGN KEY (eszkoz_id) REFERENCES eszkozok(id) "
+            "ON DELETE CASCADE)"
+        )
         self.kapcsolat.commit()
 
     def evk_felulet_elkeszitese(self):
-        beviteli_sor = ttk.Frame(self, padding=10)
+        eszkoz_frame = ttk.LabelFrame(self, text="Eszközök", padding=10)
+        eszkoz_frame.pack(fill="both", expand=True, padx=10, pady=10)
+
+        beviteli_sor = ttk.Frame(eszkoz_frame)
         beviteli_sor.pack(fill="x")
 
         ttk.Label(beviteli_sor, text="Eszköz neve:").grid(row=0, column=0)
@@ -40,20 +55,59 @@ class EVKEszkozNyilvantarto(tk.Tk):
         ).grid(row=0, column=4, padx=5)
 
         self.lista = ttk.Treeview(
-            self,
+            eszkoz_frame,
             columns=("id", "nev", "kategoria"),
-            show="headings"
+            show="headings",
+            height=6
         )
         self.lista.heading("id", text="Azonosító")
         self.lista.heading("nev", text="Eszköz neve")
         self.lista.heading("kategoria", text="Kategória")
-        self.lista.pack(fill="both", expand=True, padx=10, pady=10)
+        self.lista.pack(fill="both", expand=True, pady=10)
 
         ttk.Button(
-            self,
+            eszkoz_frame,
             text="Kijelölt eszköz törlése",
             command=self.evk_eszkoz_torlese
-        ).pack(pady=(0, 10))
+        ).pack()
+
+        naplo_frame = ttk.LabelFrame(
+            self,
+            text="Karbantartási napló",
+            padding=10
+        )
+        naplo_frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+
+        naplo_bevitel = ttk.Frame(naplo_frame)
+        naplo_bevitel.pack(fill="x")
+
+        ttk.Label(naplo_bevitel, text="Dátum (ÉÉÉÉ-HH-NN):").grid(
+            row=0, column=0
+        )
+        self.datum_mezo = ttk.Entry(naplo_bevitel, width=14)
+        self.datum_mezo.grid(row=0, column=1, padx=5)
+        self.datum_mezo.insert(0, date.today().isoformat())
+
+        ttk.Label(naplo_bevitel, text="Leírás:").grid(row=0, column=2)
+        self.leiras_mezo = ttk.Entry(naplo_bevitel, width=35)
+        self.leiras_mezo.grid(row=0, column=3, padx=5)
+
+        ttk.Button(
+            naplo_bevitel,
+            text="Naplóbejegyzés hozzáadása",
+            command=self.evk_karbantartas_hozzaadas
+        ).grid(row=0, column=4, padx=5)
+
+        self.karb_lista = ttk.Treeview(
+            naplo_frame,
+            columns=("datum", "eszkoz", "leiras"),
+            show="headings",
+            height=6
+        )
+        self.karb_lista.heading("datum", text="Dátum")
+        self.karb_lista.heading("eszkoz", text="Eszköz")
+        self.karb_lista.heading("leiras", text="Karbantartás leírása")
+        self.karb_lista.pack(fill="both", expand=True, pady=10)
 
     def evk_eszkoz_hozzaadas(self):
         nev = self.nev_mezo.get().strip()
@@ -86,6 +140,8 @@ class EVKEszkozNyilvantarto(tk.Tk):
         for eszkoz in eszkozok:
             self.lista.insert("", tk.END, values=eszkoz)
 
+        self.evk_karbantartas_lista_frissitese()
+
     def evk_eszkoz_torlese(self):
         kijelolt = self.lista.selection()
 
@@ -97,10 +153,10 @@ class EVKEszkozNyilvantarto(tk.Tk):
             return
 
         eszkoz = self.lista.item(kijelolt[0], "values")
-
         biztos = messagebox.askyesno(
             "Törlés megerősítése",
-            f"Biztosan törlöd ezt az eszközt: {eszkoz[1]}?"
+            f"Biztosan törlöd ezt az eszközt: {eszkoz[1]}? "
+            "A kapcsolódó naplóbejegyzések is törlődnek."
         )
 
         if biztos:
@@ -110,3 +166,57 @@ class EVKEszkozNyilvantarto(tk.Tk):
             )
             self.kapcsolat.commit()
             self.evk_lista_frissitese()
+
+    def evk_karbantartas_hozzaadas(self):
+        kijelolt = self.lista.selection()
+
+        if not kijelolt:
+            messagebox.showwarning(
+                "Nincs kijelölés",
+                "Jelöld ki azt az eszközt, amelyhez bejegyzést készítesz!"
+            )
+            return
+
+        datum = self.datum_mezo.get().strip()
+        leiras = self.leiras_mezo.get().strip()
+
+        try:
+            datetime.strptime(datum, "%Y-%m-%d")
+        except ValueError:
+            messagebox.showwarning(
+                "Hibás dátum",
+                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-01."
+            )
+            return
+
+        if not leiras:
+            messagebox.showwarning(
+                "Hiányzó leírás",
+                "Írd le röviden a karbantartás tartalmát!"
+            )
+            return
+
+        eszkoz = self.lista.item(kijelolt[0], "values")
+
+        self.kapcsolat.execute(
+            "INSERT INTO karbantartas (eszkoz_id, datum, leiras) "
+            "VALUES (?, ?, ?)",
+            (eszkoz[0], datum, leiras)
+        )
+        self.kapcsolat.commit()
+        self.leiras_mezo.delete(0, tk.END)
+        self.evk_karbantartas_lista_frissitese()
+
+    def evk_karbantartas_lista_frissitese(self):
+        for sor in self.karb_lista.get_children():
+            self.karb_lista.delete(sor)
+
+        bejegyzesek = self.kapcsolat.execute(
+            "SELECT karbantartas.datum, eszkozok.nev, karbantartas.leiras "
+            "FROM karbantartas "
+            "JOIN eszkozok ON eszkozok.id = karbantartas.eszkoz_id "
+            "ORDER BY karbantartas.datum DESC"
+        ).fetchall()
+
+        for bejegyzes in bejegyzesek:
+            self.karb_lista.insert("", tk.END, values=bejegyzes)
