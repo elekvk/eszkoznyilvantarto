@@ -60,6 +60,25 @@ class EVKEszkozNyilvantarto(tk.Tk):
             command=self.evk_eszkoz_modositasa
         ).grid(row=1, column=4, pady=5)
 
+        kereso_sor = ttk.Frame(eszkoz_frame)
+        kereso_sor.pack(fill="x", pady=(5, 0))
+
+        ttk.Label(kereso_sor, text="Keresés:").pack(side="left")
+        self.kereso_mezo = ttk.Entry(kereso_sor)
+        self.kereso_mezo.pack(side="left", fill="x", expand=True, padx=5)
+
+        ttk.Button(
+            kereso_sor,
+            text="Keresés",
+            command=self.evk_eszkoz_keresese
+        ).pack(side="left", padx=5)
+
+        ttk.Button(
+            kereso_sor,
+            text="Összes eszköz",
+            command=self.evk_lista_frissitese
+        ).pack(side="left")
+
         self.lista = ttk.Treeview(
             eszkoz_frame,
             columns=("id", "nev", "kategoria"),
@@ -139,12 +158,19 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.kategoria_mezo.delete(0, tk.END)
         self.evk_lista_frissitese()
 
-    def evk_lista_frissitese(self):
+    def evk_eszkoz_keresese(self):
+        kereses = self.kereso_mezo.get().strip()
+        self.evk_lista_frissitese(kereses)
+
+    def evk_lista_frissitese(self, kereses=""):
         for sor in self.lista.get_children():
             self.lista.delete(sor)
 
         eszkozok = self.kapcsolat.execute(
-            "SELECT id, nev, kategoria FROM eszkozok ORDER BY nev"
+            "SELECT id, nev, kategoria FROM eszkozok "
+            "WHERE nev LIKE ? OR kategoria LIKE ? "
+            "ORDER BY nev",
+            (f"%{kereses}%", f"%{kereses}%")
         ).fetchall()
 
         for eszkoz in eszkozok:
