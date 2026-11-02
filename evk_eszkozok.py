@@ -129,14 +129,21 @@ class EVKEszkozNyilvantarto(tk.Tk):
 
         self.karb_lista = ttk.Treeview(
             naplo_frame,
-            columns=("datum", "eszkoz", "leiras"),
+            columns=("id", "datum", "eszkoz", "leiras"),
             show="headings",
             height=6
         )
+        self.karb_lista.heading("id", text="Azonosító")
         self.karb_lista.heading("datum", text="Dátum")
         self.karb_lista.heading("eszkoz", text="Eszköz")
         self.karb_lista.heading("leiras", text="Karbantartás leírása")
         self.karb_lista.pack(fill="both", expand=True, pady=10)
+
+        ttk.Button(
+            naplo_frame,
+            text="Kijelölt naplóbejegyzés törlése",
+            command=self.evk_karbantartas_torlese
+        ).pack()
 
     def evk_eszkoz_hozzaadas(self):
         nev = self.nev_mezo.get().strip()
@@ -248,7 +255,8 @@ class EVKEszkozNyilvantarto(tk.Tk):
             self.karb_lista.delete(sor)
 
         bejegyzesek = self.kapcsolat.execute(
-            "SELECT karbantartas.datum, eszkozok.nev, karbantartas.leiras "
+            "SELECT karbantartas.id, karbantartas.datum, "
+            "eszkozok.nev, karbantartas.leiras "
             "FROM karbantartas "
             "JOIN eszkozok ON eszkozok.id = karbantartas.eszkoz_id "
             "ORDER BY karbantartas.datum DESC"
@@ -256,6 +264,31 @@ class EVKEszkozNyilvantarto(tk.Tk):
 
         for bejegyzes in bejegyzesek:
             self.karb_lista.insert("", tk.END, values=bejegyzes)
+
+    def evk_karbantartas_torlese(self):
+        kijelolt = self.karb_lista.selection()
+
+        if not kijelolt:
+            messagebox.showwarning(
+                "Nincs kijelölés",
+                "Előbb jelölj ki egy naplóbejegyzést!"
+            )
+            return
+
+        bejegyzes = self.karb_lista.item(kijelolt[0], "values")
+        biztos = messagebox.askyesno(
+            "Törlés megerősítése",
+            f"Biztosan törlöd a {bejegyzes[1]} dátumú "
+            f"{bejegyzes[2]} eszközhöz tartozó bejegyzést?"
+        )
+
+        if biztos:
+            self.kapcsolat.execute(
+                "DELETE FROM karbantartas WHERE id = ?",
+                (bejegyzes[0],)
+            )
+            self.kapcsolat.commit()
+            self.evk_karbantartas_lista_frissitese()
 
     def evk_kijelolt_eszkoz_betoltese(self, event=None):
         kijelolt = self.lista.selection()
