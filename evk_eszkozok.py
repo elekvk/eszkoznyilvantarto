@@ -137,12 +137,22 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.karb_lista.heading("datum", text="Dátum")
         self.karb_lista.heading("eszkoz", text="Eszköz")
         self.karb_lista.heading("leiras", text="Karbantartás leírása")
+        self.karb_lista.bind(
+            "<<TreeviewSelect>>",
+            self.evk_kijelolt_karbantartas_betoltese
+        )
         self.karb_lista.pack(fill="both", expand=True, pady=10)
 
         ttk.Button(
             naplo_frame,
             text="Kijelölt naplóbejegyzés törlése",
             command=self.evk_karbantartas_torlese
+        ).pack()
+
+        ttk.Button(
+            naplo_frame,
+            text="Kijelölt naplóbejegyzés módosítása",
+            command=self.evk_karbantartas_modositasa
         ).pack()
 
     def evk_eszkoz_hozzaadas(self):
@@ -228,7 +238,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         except ValueError:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-01."
+                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-08."
             )
             return
 
@@ -289,6 +299,54 @@ class EVKEszkozNyilvantarto(tk.Tk):
             )
             self.kapcsolat.commit()
             self.evk_karbantartas_lista_frissitese()
+
+    def evk_kijelolt_karbantartas_betoltese(self, event=None):
+        kijelolt = self.karb_lista.selection()
+
+        if kijelolt:
+            bejegyzes = self.karb_lista.item(kijelolt[0], "values")
+            self.datum_mezo.delete(0, tk.END)
+            self.datum_mezo.insert(0, bejegyzes[1])
+            self.leiras_mezo.delete(0, tk.END)
+            self.leiras_mezo.insert(0, bejegyzes[3])
+
+    def evk_karbantartas_modositasa(self):
+        kijelolt = self.karb_lista.selection()
+
+        if not kijelolt:
+            messagebox.showwarning(
+                "Nincs kijelölés",
+                "Előbb jelölj ki egy naplóbejegyzést!"
+            )
+            return
+
+        datum = self.datum_mezo.get().strip()
+        leiras = self.leiras_mezo.get().strip()
+
+        try:
+            datetime.strptime(datum, "%Y-%m-%d")
+        except ValueError:
+            messagebox.showwarning(
+                "Hibás dátum",
+                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-08."
+            )
+            return
+
+        if not leiras:
+            messagebox.showwarning(
+                "Hiányzó leírás",
+                "Írd le röviden a karbantartás tartalmát!"
+            )
+            return
+
+        bejegyzes = self.karb_lista.item(kijelolt[0], "values")
+        self.kapcsolat.execute(
+            "UPDATE karbantartas SET datum = ?, leiras = ? WHERE id = ?",
+            (datum, leiras, bejegyzes[0])
+        )
+        self.kapcsolat.commit()
+        self.evk_karbantartas_lista_frissitese()
+        self.leiras_mezo.delete(0, tk.END)
 
     def evk_kijelolt_eszkoz_betoltese(self, event=None):
         kijelolt = self.lista.selection()
