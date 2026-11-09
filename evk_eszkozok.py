@@ -1,7 +1,8 @@
+import csv
 import sqlite3
 import tkinter as tk
 from datetime import date, datetime
-from tkinter import messagebox, ttk
+from tkinter import filedialog, messagebox, ttk
 
 
 class EVKEszkozNyilvantarto(tk.Tk):
@@ -155,6 +156,12 @@ class EVKEszkozNyilvantarto(tk.Tk):
             command=self.evk_karbantartas_modositasa
         ).pack()
 
+        ttk.Button(
+            naplo_frame,
+            text="Karbantartási napló mentése CSV-fájlba",
+            command=self.evk_karbantartas_exportalasa
+        ).pack()
+
     def evk_eszkoz_hozzaadas(self):
         nev = self.nev_mezo.get().strip()
         kategoria = self.kategoria_mezo.get().strip()
@@ -238,7 +245,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         except ValueError:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-08."
+                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-09."
             )
             return
 
@@ -328,7 +335,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         except ValueError:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-08."
+                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-09."
             )
             return
 
@@ -347,6 +354,55 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.kapcsolat.commit()
         self.evk_karbantartas_lista_frissitese()
         self.leiras_mezo.delete(0, tk.END)
+
+    def evk_karbantartas_exportalasa(self):
+        bejegyzesek = self.kapcsolat.execute(
+            "SELECT karbantartas.datum, eszkozok.nev, "
+            "karbantartas.leiras "
+            "FROM karbantartas "
+            "JOIN eszkozok ON eszkozok.id = karbantartas.eszkoz_id "
+            "ORDER BY karbantartas.datum DESC"
+        ).fetchall()
+
+        if not bejegyzesek:
+            messagebox.showwarning(
+                "Nincs adat",
+                "A karbantartási napló még üres."
+            )
+            return
+
+        fajlnev = filedialog.asksaveasfilename(
+            title="Karbantartási napló mentése",
+            defaultextension=".csv",
+            filetypes=[("CSV-fájl", "*.csv")]
+        )
+
+        if not fajlnev:
+            return
+
+        try:
+            with open(
+                fajlnev,
+                "w",
+                newline="",
+                encoding="utf-8-sig"
+            ) as fajl:
+                iro = csv.writer(fajl, delimiter=";")
+                iro.writerow(
+                    ["Dátum", "Eszköz", "Karbantartás leírása"]
+                )
+                iro.writerows(bejegyzesek)
+        except OSError as hiba:
+            messagebox.showerror(
+                "Mentési hiba",
+                f"A fájl mentése nem sikerült: {hiba}"
+            )
+            return
+
+        messagebox.showinfo(
+            "Sikeres mentés",
+            "A karbantartási napló CSV-fájlba került."
+        )
 
     def evk_kijelolt_eszkoz_betoltese(self, event=None):
         kijelolt = self.lista.selection()
