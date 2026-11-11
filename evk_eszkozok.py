@@ -128,6 +128,34 @@ class EVKEszkozNyilvantarto(tk.Tk):
             command=self.evk_karbantartas_hozzaadas
         ).grid(row=0, column=4, padx=5)
 
+        karb_kereso_sor = ttk.Frame(naplo_frame)
+        karb_kereso_sor.pack(fill="x", pady=(5, 0))
+
+        ttk.Label(karb_kereso_sor, text="Napló keresése:").pack(side="left")
+        self.karb_kereso_mezo = ttk.Entry(karb_kereso_sor)
+        self.karb_kereso_mezo.pack(
+            side="left",
+            fill="x",
+            expand=True,
+            padx=5
+        )
+        self.karb_kereso_mezo.bind(
+            "<Return>",
+            self.evk_karbantartas_keresese
+        )
+
+        ttk.Button(
+            karb_kereso_sor,
+            text="Keresés",
+            command=self.evk_karbantartas_keresese
+        ).pack(side="left", padx=5)
+
+        ttk.Button(
+            karb_kereso_sor,
+            text="Teljes napló",
+            command=self.evk_karbantartas_lista_frissitese
+        ).pack(side="left")
+
         self.karb_lista = ttk.Treeview(
             naplo_frame,
             columns=("id", "datum", "eszkoz", "leiras"),
@@ -245,7 +273,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         except ValueError:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-09."
+                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-11."
             )
             return
 
@@ -267,16 +295,25 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.leiras_mezo.delete(0, tk.END)
         self.evk_karbantartas_lista_frissitese()
 
-    def evk_karbantartas_lista_frissitese(self):
+    def evk_karbantartas_keresese(self, event=None):
+        kereses = self.karb_kereso_mezo.get().strip()
+        self.evk_karbantartas_lista_frissitese(kereses)
+
+    def evk_karbantartas_lista_frissitese(self, kereses=""):
         for sor in self.karb_lista.get_children():
             self.karb_lista.delete(sor)
 
+        arany = f"%{kereses}%"
         bejegyzesek = self.kapcsolat.execute(
             "SELECT karbantartas.id, karbantartas.datum, "
             "eszkozok.nev, karbantartas.leiras "
             "FROM karbantartas "
             "JOIN eszkozok ON eszkozok.id = karbantartas.eszkoz_id "
-            "ORDER BY karbantartas.datum DESC"
+            "WHERE karbantartas.datum LIKE ? "
+            "OR eszkozok.nev LIKE ? "
+            "OR karbantartas.leiras LIKE ? "
+            "ORDER BY karbantartas.datum DESC",
+            (arany, arany, arany)
         ).fetchall()
 
         for bejegyzes in bejegyzesek:
@@ -335,7 +372,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         except ValueError:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-09."
+                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-11."
             )
             return
 
