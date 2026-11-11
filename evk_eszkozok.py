@@ -17,6 +17,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.evk_adatbazis_elokeszitese()
         self.evk_felulet_elkeszitese()
         self.evk_lista_frissitese()
+        self.evk_karbantartas_lista_frissitese()
 
     def evk_adatbazis_elokeszitese(self):
         self.kapcsolat.execute(
@@ -66,7 +67,16 @@ class EVKEszkozNyilvantarto(tk.Tk):
 
         ttk.Label(kereso_sor, text="Keresés:").pack(side="left")
         self.kereso_mezo = ttk.Entry(kereso_sor)
-        self.kereso_mezo.pack(side="left", fill="x", expand=True, padx=5)
+        self.kereso_mezo.pack(
+            side="left",
+            fill="x",
+            expand=True,
+            padx=5
+        )
+        self.kereso_mezo.bind(
+            "<Return>",
+            self.evk_eszkoz_keresese
+        )
 
         ttk.Button(
             kereso_sor,
@@ -77,7 +87,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         ttk.Button(
             kereso_sor,
             text="Összes eszköz",
-            command=self.evk_lista_frissitese
+            command=self.evk_osszes_eszkoz
         ).pack(side="left")
 
         self.lista = ttk.Treeview(
@@ -101,6 +111,12 @@ class EVKEszkozNyilvantarto(tk.Tk):
             command=self.evk_eszkoz_torlese
         ).pack()
 
+        ttk.Button(
+            eszkoz_frame,
+            text="Eszközlista mentése CSV-fájlba",
+            command=self.evk_eszkozok_exportalasa
+        ).pack(pady=5)
+
         naplo_frame = ttk.LabelFrame(
             self,
             text="Karbantartási napló",
@@ -112,7 +128,8 @@ class EVKEszkozNyilvantarto(tk.Tk):
         naplo_bevitel.pack(fill="x")
 
         ttk.Label(naplo_bevitel, text="Dátum (ÉÉÉÉ-HH-NN):").grid(
-            row=0, column=0
+            row=0,
+            column=0
         )
         self.datum_mezo = ttk.Entry(naplo_bevitel, width=14)
         self.datum_mezo.grid(row=0, column=1, padx=5)
@@ -131,7 +148,11 @@ class EVKEszkozNyilvantarto(tk.Tk):
         karb_kereso_sor = ttk.Frame(naplo_frame)
         karb_kereso_sor.pack(fill="x", pady=(5, 0))
 
-        ttk.Label(karb_kereso_sor, text="Napló keresése:").pack(side="left")
+        ttk.Label(
+            karb_kereso_sor,
+            text="Napló keresése:"
+        ).pack(side="left")
+
         self.karb_kereso_mezo = ttk.Entry(karb_kereso_sor)
         self.karb_kereso_mezo.pack(
             side="left",
@@ -153,7 +174,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         ttk.Button(
             karb_kereso_sor,
             text="Teljes napló",
-            command=self.evk_karbantartas_lista_frissitese
+            command=self.evk_teljes_karbantartasi_naplo
         ).pack(side="left")
 
         self.karb_lista = ttk.Treeview(
@@ -210,19 +231,24 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.kategoria_mezo.delete(0, tk.END)
         self.evk_lista_frissitese()
 
-    def evk_eszkoz_keresese(self):
+    def evk_eszkoz_keresese(self, event=None):
         kereses = self.kereso_mezo.get().strip()
         self.evk_lista_frissitese(kereses)
+
+    def evk_osszes_eszkoz(self):
+        self.kereso_mezo.delete(0, tk.END)
+        self.evk_lista_frissitese()
 
     def evk_lista_frissitese(self, kereses=""):
         for sor in self.lista.get_children():
             self.lista.delete(sor)
 
+        minta = f"%{kereses}%"
         eszkozok = self.kapcsolat.execute(
             "SELECT id, nev, kategoria FROM eszkozok "
             "WHERE nev LIKE ? OR kategoria LIKE ? "
             "ORDER BY nev",
-            (f"%{kereses}%", f"%{kereses}%")
+            (minta, minta)
         ).fetchall()
 
         for eszkoz in eszkozok:
@@ -273,7 +299,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         except ValueError:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-11."
+                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-09."
             )
             return
 
@@ -285,7 +311,6 @@ class EVKEszkozNyilvantarto(tk.Tk):
             return
 
         eszkoz = self.lista.item(kijelolt[0], "values")
-
         self.kapcsolat.execute(
             "INSERT INTO karbantartas (eszkoz_id, datum, leiras) "
             "VALUES (?, ?, ?)",
@@ -299,11 +324,18 @@ class EVKEszkozNyilvantarto(tk.Tk):
         kereses = self.karb_kereso_mezo.get().strip()
         self.evk_karbantartas_lista_frissitese(kereses)
 
-    def evk_karbantartas_lista_frissitese(self, kereses=""):
+    def evk_teljes_karbantartasi_naplo(self):
+        self.karb_kereso_mezo.delete(0, tk.END)
+        self.evk_karbantartas_lista_frissitese("")
+
+    def evk_karbantartas_lista_frissitese(self, kereses=None):
         for sor in self.karb_lista.get_children():
             self.karb_lista.delete(sor)
 
-        arany = f"%{kereses}%"
+        if kereses is None:
+            kereses = self.karb_kereso_mezo.get().strip()
+
+        minta = f"%{kereses}%"
         bejegyzesek = self.kapcsolat.execute(
             "SELECT karbantartas.id, karbantartas.datum, "
             "eszkozok.nev, karbantartas.leiras "
@@ -313,7 +345,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
             "OR eszkozok.nev LIKE ? "
             "OR karbantartas.leiras LIKE ? "
             "ORDER BY karbantartas.datum DESC",
-            (arany, arany, arany)
+            (minta, minta, minta)
         ).fetchall()
 
         for bejegyzes in bejegyzesek:
@@ -372,7 +404,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         except ValueError:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-11."
+                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-09."
             )
             return
 
@@ -480,3 +512,49 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.evk_lista_frissitese()
         self.nev_mezo.delete(0, tk.END)
         self.kategoria_mezo.delete(0, tk.END)
+
+    def evk_eszkozok_exportalasa(self):
+        eszkozok = self.kapcsolat.execute(
+            "SELECT id, nev, kategoria FROM eszkozok ORDER BY nev"
+        ).fetchall()
+
+        if not eszkozok:
+            messagebox.showwarning(
+                "Nincs adat",
+                "Az eszközlista még üres."
+            )
+            return
+
+        fajlnev = filedialog.asksaveasfilename(
+            title="Eszközlista mentése",
+            initialfile="eszkozlista.csv",
+            defaultextension=".csv",
+            filetypes=[("CSV-fájl", "*.csv")]
+        )
+
+        if not fajlnev:
+            return
+
+        try:
+            with open(
+                fajlnev,
+                "w",
+                newline="",
+                encoding="utf-8-sig"
+            ) as fajl:
+                iro = csv.writer(fajl, delimiter=";")
+                iro.writerow(
+                    ["Azonosító", "Eszköz neve", "Kategória"]
+                )
+                iro.writerows(eszkozok)
+        except OSError as hiba:
+            messagebox.showerror(
+                "Mentési hiba",
+                f"A fájl mentése nem sikerült: {hiba}"
+            )
+            return
+
+        messagebox.showinfo(
+            "Sikeres mentés",
+            "Az eszközlista CSV-fájlba került."
+        )
