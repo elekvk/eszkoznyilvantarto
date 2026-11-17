@@ -18,9 +18,15 @@ A program a `main.py` fájl elindításával futtatható.
 
 ## Használt modulok
 
-- `tkinter`, `ttk`, `messagebox` – grafikus felület és eseménykezelés
-- `sqlite3` – adatbázis-kezelés (`connect`, `execute`, `commit`, `fetchall`)
-- `datetime` – dátum kezelése és ellenőrzése
+- Tanult modul: `tkinter` – grafikus felület és eseménykezelés (`ttk`, `messagebox`)
+- Bemutatandó modul: `sqlite3` – az adatbázis kezelése
+  - `sqlite3.connect("eszkozok.db")` – kapcsolat létrehozása
+  - `self.kapcsolat.execute(...)` – SQL-parancs végrehajtása
+  - `self.kapcsolat.commit()` – módosítások mentése
+  - `.fetchall()` – lekérdezési eredmények beolvasása
+- Saját modul: `evk_eszkozok.py` – a program osztályát és saját metódusait tartalmazza
+- `datetime` – dátum lekérése és ellenőrzése
+- `csv` és `filedialog` – adatok CSV-fájlba mentése és a fájl helyének kiválasztása
 
 ## Saját osztály és függvények
 
