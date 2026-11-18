@@ -10,7 +10,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         super().__init__()
         self.title("Eszköznyilvántartó és karbantartási napló")
         self.geometry("850x700")
-
+        self.protocol("WM_DELETE_WINDOW", self.evk_ablak_bezarasa)
         self.kapcsolat = sqlite3.connect("eszkozok.db")
         self.kapcsolat.execute("PRAGMA foreign_keys = ON")
 
@@ -558,3 +558,6 @@ class EVKEszkozNyilvantarto(tk.Tk):
             "Sikeres mentés",
             "Az eszközlista CSV-fájlba került."
         )
+    def evk_ablak_bezarasa(self):
+            self.kapcsolat.close()
+            self.destroy()
