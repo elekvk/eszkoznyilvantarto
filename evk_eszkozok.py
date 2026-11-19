@@ -11,13 +11,13 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.title("Eszköznyilvántartó és karbantartási napló")
         self.geometry("850x700")
         self.protocol("WM_DELETE_WINDOW", self.evk_ablak_bezarasa)
+
         self.kapcsolat = sqlite3.connect("eszkozok.db")
         self.kapcsolat.execute("PRAGMA foreign_keys = ON")
 
         self.evk_adatbazis_elokeszitese()
         self.evk_felulet_elkeszitese()
         self.evk_lista_frissitese()
-        self.evk_karbantartas_lista_frissitese()
 
     def evk_adatbazis_elokeszitese(self):
         self.kapcsolat.execute(
@@ -89,6 +89,12 @@ class EVKEszkozNyilvantarto(tk.Tk):
             text="Összes eszköz",
             command=self.evk_osszes_eszkoz
         ).pack(side="left")
+
+        self.ossz_eszkoz_cimke = ttk.Label(
+            eszkoz_frame,
+            text="Nyilvántartott eszközök száma: 0"
+        )
+        self.ossz_eszkoz_cimke.pack(anchor="w", pady=(5, 0))
 
         self.lista = ttk.Treeview(
             eszkoz_frame,
@@ -239,6 +245,14 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.kereso_mezo.delete(0, tk.END)
         self.evk_lista_frissitese()
 
+    def evk_eszkoz_db_frissitese(self):
+        darab = self.kapcsolat.execute(
+            "SELECT COUNT(*) FROM eszkozok"
+        ).fetchone()[0]
+        self.ossz_eszkoz_cimke.config(
+            text=f"Nyilvántartott eszközök száma: {darab}"
+        )
+
     def evk_lista_frissitese(self, kereses=""):
         for sor in self.lista.get_children():
             self.lista.delete(sor)
@@ -254,6 +268,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         for eszkoz in eszkozok:
             self.lista.insert("", tk.END, values=eszkoz)
 
+        self.evk_eszkoz_db_frissitese()
         self.evk_karbantartas_lista_frissitese()
 
     def evk_eszkoz_torlese(self):
@@ -299,7 +314,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         except ValueError:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-09."
+                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-19."
             )
             return
 
@@ -404,7 +419,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         except ValueError:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-09."
+                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-19."
             )
             return
 
@@ -558,6 +573,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
             "Sikeres mentés",
             "Az eszközlista CSV-fájlba került."
         )
+
     def evk_ablak_bezarasa(self):
-            self.kapcsolat.close()
-            self.destroy()
+        self.kapcsolat.close()
+        self.destroy()
