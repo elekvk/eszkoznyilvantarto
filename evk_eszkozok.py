@@ -133,13 +133,13 @@ class EVKEszkozNyilvantarto(tk.Tk):
         naplo_bevitel = ttk.Frame(naplo_frame)
         naplo_bevitel.pack(fill="x")
 
-        ttk.Label(naplo_bevitel, text="Dátum (ÉÉÉÉ-HH-NN):").grid(
+        ttk.Label(naplo_bevitel, text="Dátum (ÉÉÉÉ.HH.NN.):").grid(
             row=0,
             column=0
         )
         self.datum_mezo = ttk.Entry(naplo_bevitel, width=14)
         self.datum_mezo.grid(row=0, column=1, padx=5)
-        self.datum_mezo.insert(0, date.today().isoformat())
+        self.datum_mezo.insert(0, date.today().strftime("%Y.%m.%d."))
 
         ttk.Label(naplo_bevitel, text="Leírás:").grid(row=0, column=2)
         self.leiras_mezo = ttk.Entry(naplo_bevitel, width=35)
@@ -308,22 +308,23 @@ class EVKEszkozNyilvantarto(tk.Tk):
 
         datum = self.datum_mezo.get().strip()
         leiras = self.leiras_mezo.get().strip()
+        datum_ertek = None
 
-        try:
-            datetime.strptime(datum, "%Y-%m-%d")
-        except ValueError:
+        for formatum in ("%Y.%m.%d.", "%Y.%m.%d"):
+            try:
+                datum_ertek = datetime.strptime(datum, formatum).date()
+                break
+            except ValueError:
+                pass
+
+        if datum_ertek is None:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-19."
+                "A dátum formátuma legyen például 2026.11.19. vagy 2026.11.19"
             )
             return
 
-        if not leiras:
-            messagebox.showwarning(
-                "Hiányzó leírás",
-                "Írd le röviden a karbantartás tartalmát!"
-            )
-            return
+        datum = datum_ertek.isoformat()
 
         eszkoz = self.lista.item(kijelolt[0], "values")
         self.kapcsolat.execute(
@@ -364,7 +365,12 @@ class EVKEszkozNyilvantarto(tk.Tk):
         ).fetchall()
 
         for bejegyzes in bejegyzesek:
-            self.karb_lista.insert("", tk.END, values=bejegyzes)
+            datum = datetime.strptime(bejegyzes[1], "%Y-%m-%d").strftime("%Y.%m.%d.")
+            self.karb_lista.insert(
+                "",
+                tk.END,
+                values=(bejegyzes[0], datum, bejegyzes[2], bejegyzes[3])
+            )
 
     def evk_karbantartas_torlese(self):
         kijelolt = self.karb_lista.selection()
