@@ -9,7 +9,7 @@ class EVKEszkozNyilvantarto:
     def __init__(self, root):
         self.root = root
         self.root.title("Eszköznyilvántartó és karbantartási napló")
-        self.root.geometry("850x700")
+        self.root.geometry("850x800")
         self.root.protocol("WM_DELETE_WINDOW", self.evk_ablak_bezarasa)
 
         self.kapcsolat = sqlite3.connect("eszkozok.db")
