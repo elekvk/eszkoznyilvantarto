@@ -5,12 +5,12 @@ from datetime import date, datetime
 from tkinter import filedialog, messagebox, ttk
 
 
-class EVKEszkozNyilvantarto(tk.Tk):
-    def __init__(self):
-        super().__init__()
-        self.title("Eszköznyilvántartó és karbantartási napló")
-        self.geometry("850x700")
-        self.protocol("WM_DELETE_WINDOW", self.evk_ablak_bezarasa)
+class EVKEszkozNyilvantarto:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Eszköznyilvántartó és karbantartási napló")
+        self.root.geometry("850x700")
+        self.root.protocol("WM_DELETE_WINDOW", self.evk_ablak_bezarasa)
 
         self.kapcsolat = sqlite3.connect("eszkozok.db")
         self.kapcsolat.execute("PRAGMA foreign_keys = ON")
@@ -36,7 +36,11 @@ class EVKEszkozNyilvantarto(tk.Tk):
         self.kapcsolat.commit()
 
     def evk_felulet_elkeszitese(self):
-        eszkoz_frame = ttk.LabelFrame(self, text="Eszközök", padding=10)
+        eszkoz_frame = ttk.LabelFrame(
+            self.root,
+            text="Eszközök",
+            padding=10
+        )
         eszkoz_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         beviteli_sor = ttk.Frame(eszkoz_frame)
@@ -124,7 +128,7 @@ class EVKEszkozNyilvantarto(tk.Tk):
         ).pack(pady=5)
 
         naplo_frame = ttk.LabelFrame(
-            self,
+            self.root,
             text="Karbantartási napló",
             padding=10
         )
@@ -229,7 +233,10 @@ class EVKEszkozNyilvantarto(tk.Tk):
     def evk_datum_atalakitasa(self, datum):
         for formatum in ("%Y.%m.%d.", "%Y.%m.%d"):
             try:
-                return datetime.strptime(datum, formatum).date().isoformat()
+                return datetime.strptime(
+                    datum,
+                    formatum
+                ).date().isoformat()
             except ValueError:
                 pass
         return None
@@ -331,7 +338,8 @@ class EVKEszkozNyilvantarto(tk.Tk):
         if datum is None:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen például 2026.11.19. vagy 2026.11.19"
+                "A dátum formátuma legyen például "
+                "2026.11.19. vagy 2026.11.19"
             )
             return
 
@@ -463,7 +471,8 @@ class EVKEszkozNyilvantarto(tk.Tk):
         if datum is None:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen például 2026.11.19. vagy 2026.11.19"
+                "A dátum formátuma legyen például "
+                "2026.11.19. vagy 2026.11.19"
             )
             return
 
@@ -626,4 +635,4 @@ class EVKEszkozNyilvantarto(tk.Tk):
 
     def evk_ablak_bezarasa(self):
         self.kapcsolat.close()
-        self.destroy()
+        self.root.destroy()
