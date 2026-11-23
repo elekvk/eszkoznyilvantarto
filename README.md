@@ -57,6 +57,6 @@ Saját modul: `evk_eszkozok.py`
 
 Saját osztály: `EVKEszkozNyilvantarto`
 
-Fontosabb saját metódusok: `evk_eszkoz_hozzaadas`, `evk_eszkoz_modositasa`, `evk_eszkoz_torlese`, `evk_eszkoz_keresese`, `evk_karbantartas_hozzaadas`, `evk_karbantartas_modositasa`, `evk_karbantartas_torlese`, `evk_karbantartas_keresese`, `evk_eszkozok_exportalasa`, `evk_karbantartas_exportalasa`.
+Fontosabb saját metódusok: `evk_adatbazis_elokeszitese`, `evk_felulet_elkeszitese`, `evk_datum_atalakitasa`, `evk_eszkoz_hozzaadas`, `evk_eszkoz_keresese`, `evk_osszes_eszkoz`, `evk_eszkoz_db_frissitese`, `evk_lista_frissitese`, `evk_eszkoz_torlese`, `evk_eszkoz_modositasa`, `evk_karbantartas_hozzaadas`, `evk_karbantartas_keresese`, `evk_teljes_karbantartasi_naplo`, `evk_karbantartas_lista_frissitese`, `evk_karbantartas_torlese`, `evk_kijelolt_karbantartas_betoltese`, `evk_karbantartas_modositasa`, `evk_karbantartas_exportalasa`, `evk_eszkozok_exportalasa`, `evk_ablak_bezarasa`.
 
 A saját metódusok neve az `evk` monogrammal kezdődik.
