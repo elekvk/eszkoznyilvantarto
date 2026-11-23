@@ -139,7 +139,10 @@ class EVKEszkozNyilvantarto(tk.Tk):
         )
         self.datum_mezo = ttk.Entry(naplo_bevitel, width=14)
         self.datum_mezo.grid(row=0, column=1, padx=5)
-        self.datum_mezo.insert(0, date.today().strftime("%Y.%m.%d."))
+        self.datum_mezo.insert(
+            0,
+            date.today().strftime("%Y.%m.%d.")
+        )
 
         ttk.Label(naplo_bevitel, text="Leírás:").grid(row=0, column=2)
         self.leiras_mezo = ttk.Entry(naplo_bevitel, width=35)
@@ -183,6 +186,12 @@ class EVKEszkozNyilvantarto(tk.Tk):
             command=self.evk_teljes_karbantartasi_naplo
         ).pack(side="left")
 
+        self.karb_db_cimke = ttk.Label(
+            naplo_frame,
+            text="Megjelenített naplóbejegyzések száma: 0"
+        )
+        self.karb_db_cimke.pack(anchor="w", pady=(5, 0))
+
         self.karb_lista = ttk.Treeview(
             naplo_frame,
             columns=("id", "datum", "eszkoz", "leiras"),
@@ -216,6 +225,14 @@ class EVKEszkozNyilvantarto(tk.Tk):
             text="Karbantartási napló mentése CSV-fájlba",
             command=self.evk_karbantartas_exportalasa
         ).pack()
+
+    def evk_datum_atalakitasa(self, datum):
+        for formatum in ("%Y.%m.%d.", "%Y.%m.%d"):
+            try:
+                return datetime.strptime(datum, formatum).date().isoformat()
+            except ValueError:
+                pass
+        return None
 
     def evk_eszkoz_hozzaadas(self):
         nev = self.nev_mezo.get().strip()
@@ -306,25 +323,24 @@ class EVKEszkozNyilvantarto(tk.Tk):
             )
             return
 
-        datum = self.datum_mezo.get().strip()
+        datum = self.evk_datum_atalakitasa(
+            self.datum_mezo.get().strip()
+        )
         leiras = self.leiras_mezo.get().strip()
-        datum_ertek = None
 
-        for formatum in ("%Y.%m.%d.", "%Y.%m.%d"):
-            try:
-                datum_ertek = datetime.strptime(datum, formatum).date()
-                break
-            except ValueError:
-                pass
-
-        if datum_ertek is None:
+        if datum is None:
             messagebox.showwarning(
                 "Hibás dátum",
                 "A dátum formátuma legyen például 2026.11.19. vagy 2026.11.19"
             )
             return
 
-        datum = datum_ertek.isoformat()
+        if not leiras:
+            messagebox.showwarning(
+                "Hiányzó leírás",
+                "Írd le röviden a karbantartás tartalmát!"
+            )
+            return
 
         eszkoz = self.lista.item(kijelolt[0], "values")
         self.kapcsolat.execute(
@@ -352,6 +368,13 @@ class EVKEszkozNyilvantarto(tk.Tk):
             kereses = self.karb_kereso_mezo.get().strip()
 
         minta = f"%{kereses}%"
+        datum_kereses = self.evk_datum_atalakitasa(kereses)
+
+        if datum_kereses is not None:
+            datum_minta = f"%{datum_kereses}%"
+        else:
+            datum_minta = minta
+
         bejegyzesek = self.kapcsolat.execute(
             "SELECT karbantartas.id, karbantartas.datum, "
             "eszkozok.nev, karbantartas.leiras "
@@ -361,15 +384,30 @@ class EVKEszkozNyilvantarto(tk.Tk):
             "OR eszkozok.nev LIKE ? "
             "OR karbantartas.leiras LIKE ? "
             "ORDER BY karbantartas.datum DESC",
-            (minta, minta, minta)
+            (datum_minta, minta, minta)
         ).fetchall()
 
+        self.karb_db_cimke.config(
+            text=(
+                "Megjelenített naplóbejegyzések száma: "
+                f"{len(bejegyzesek)}"
+            )
+        )
+
         for bejegyzes in bejegyzesek:
-            datum = datetime.strptime(bejegyzes[1], "%Y-%m-%d").strftime("%Y.%m.%d.")
+            datum = datetime.strptime(
+                bejegyzes[1],
+                "%Y-%m-%d"
+            ).strftime("%Y.%m.%d.")
             self.karb_lista.insert(
                 "",
                 tk.END,
-                values=(bejegyzes[0], datum, bejegyzes[2], bejegyzes[3])
+                values=(
+                    bejegyzes[0],
+                    datum,
+                    bejegyzes[2],
+                    bejegyzes[3]
+                )
             )
 
     def evk_karbantartas_torlese(self):
@@ -417,15 +455,15 @@ class EVKEszkozNyilvantarto(tk.Tk):
             )
             return
 
-        datum = self.datum_mezo.get().strip()
+        datum = self.evk_datum_atalakitasa(
+            self.datum_mezo.get().strip()
+        )
         leiras = self.leiras_mezo.get().strip()
 
-        try:
-            datetime.strptime(datum, "%Y-%m-%d")
-        except ValueError:
+        if datum is None:
             messagebox.showwarning(
                 "Hibás dátum",
-                "A dátum formátuma legyen ÉÉÉÉ-HH-NN, például 2026-11-19."
+                "A dátum formátuma legyen például 2026.11.19. vagy 2026.11.19"
             )
             return
 
@@ -481,7 +519,13 @@ class EVKEszkozNyilvantarto(tk.Tk):
                 iro.writerow(
                     ["Dátum", "Eszköz", "Karbantartás leírása"]
                 )
-                iro.writerows(bejegyzesek)
+
+                for datum, eszkoz, leiras in bejegyzesek:
+                    datum = datetime.strptime(
+                        datum,
+                        "%Y-%m-%d"
+                    ).strftime("%Y.%m.%d.")
+                    iro.writerow((datum, eszkoz, leiras))
         except OSError as hiba:
             messagebox.showerror(
                 "Mentési hiba",
