@@ -106,9 +106,21 @@ class EVKEszkozNyilvantarto:
             show="headings",
             height=6
         )
-        self.lista.heading("id", text="Azonosító")
-        self.lista.heading("nev", text="Eszköz neve")
-        self.lista.heading("kategoria", text="Kategória")
+        self.lista.heading(
+            "id",
+            text="Azonosító",
+            command=lambda: self.evk_eszkoz_lista_rendezese("id")
+        )
+        self.lista.heading(
+            "nev",
+            text="Eszköz neve",
+            command=lambda: self.evk_eszkoz_lista_rendezese("nev")
+        )
+        self.lista.heading(
+            "kategoria",
+            text="Kategória",
+            command=lambda: self.evk_eszkoz_lista_rendezese("kategoria")
+        )
         self.lista.bind(
             "<<TreeviewSelect>>",
             self.evk_kijelolt_eszkoz_betoltese
@@ -417,6 +429,34 @@ class EVKEszkozNyilvantarto:
                     bejegyzes[3]
                 )
             )
+
+    def evk_eszkoz_lista_rendezese(self, oszlop, forditott=False):
+        sorok = [
+            (self.lista.set(sor, oszlop), sor)
+            for sor in self.lista.get_children("")
+        ]
+
+        if oszlop == "id":
+            sorok.sort(
+                key=lambda adat: int(adat[0]),
+                reverse=forditott
+            )
+        else:
+            sorok.sort(
+                key=lambda adat: adat[0].casefold(),
+                reverse=forditott
+            )
+
+        for index, (_, sor) in enumerate(sorok):
+            self.lista.move(sor, "", index)
+
+        self.lista.heading(
+            oszlop,
+            command=lambda: self.evk_eszkoz_lista_rendezese(
+                oszlop,
+                not forditott
+            )
+        )
 
     def evk_karbantartas_torlese(self):
         kijelolt = self.karb_lista.selection()
