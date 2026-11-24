@@ -214,10 +214,26 @@ class EVKEszkozNyilvantarto:
             show="headings",
             height=6
         )
-        self.karb_lista.heading("id", text="Azonosító")
-        self.karb_lista.heading("datum", text="Dátum")
-        self.karb_lista.heading("eszkoz", text="Eszköz")
-        self.karb_lista.heading("leiras", text="Karbantartás leírása")
+        self.karb_lista.heading(
+            "id",
+            text="Azonosító",
+            command=lambda: self.evk_karbantartasi_lista_rendezese("id")
+        )
+        self.karb_lista.heading(
+            "datum",
+            text="Dátum",
+            command=lambda: self.evk_karbantartasi_lista_rendezese("datum")
+        )
+        self.karb_lista.heading(
+            "eszkoz",
+            text="Eszköz",
+            command=lambda: self.evk_karbantartasi_lista_rendezese("eszkoz")
+        )
+        self.karb_lista.heading(
+            "leiras",
+            text="Karbantartás leírása",
+            command=lambda: self.evk_karbantartasi_lista_rendezese("leiras")
+        )
         self.karb_lista.bind(
             "<<TreeviewSelect>>",
             self.evk_kijelolt_karbantartas_betoltese
@@ -453,6 +469,34 @@ class EVKEszkozNyilvantarto:
         self.lista.heading(
             oszlop,
             command=lambda: self.evk_eszkoz_lista_rendezese(
+                oszlop,
+                not forditott
+            )
+        )
+
+    def evk_karbantartasi_lista_rendezese(self, oszlop, forditott=False):
+        sorok = [
+            (self.karb_lista.set(sor, oszlop), sor)
+            for sor in self.karb_lista.get_children("")
+        ]
+
+        if oszlop == "id":
+            sorok.sort(
+                key=lambda adat: int(adat[0]),
+                reverse=forditott
+            )
+        else:
+            sorok.sort(
+                key=lambda adat: adat[0].casefold(),
+                reverse=forditott
+            )
+
+        for index, (_, sor) in enumerate(sorok):
+            self.karb_lista.move(sor, "", index)
+
+        self.karb_lista.heading(
+            oszlop,
+            command=lambda: self.evk_karbantartasi_lista_rendezese(
                 oszlop,
                 not forditott
             )
