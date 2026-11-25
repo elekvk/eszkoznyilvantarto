@@ -25,28 +25,28 @@ class EVKEszkozNyilvantarto:
         if "clam" in stilus.theme_names():
             stilus.theme_use("clam")
 
-        self.root.configure(bg="#eef3f8")
+        self.root.configure(bg="#f4f4f1")
         stilus.configure(".", font=("Segoe UI", 10))
-        stilus.configure("TFrame", background="#eef3f8")
+        stilus.configure("TFrame", background="#f4f4f1")
         stilus.configure(
             "TLabel",
-            background="#eef3f8",
-            foreground="#26364a"
+            background="#f4f4f1",
+            foreground="#303632"
         )
         stilus.configure(
             "TLabelframe",
-            background="#eef3f8",
-            bordercolor="#cbd5e1",
+            background="#f4f4f1",
+            bordercolor="#d6d8d3",
             relief="solid"
         )
         stilus.configure(
             "TLabelframe.Label",
-            background="#eef3f8",
-            foreground="#1f4e79",
+            background="#f4f4f1",
+            foreground="#486a50",
             font=("Segoe UI", 11, "bold")
         )
         stilus.configure("TEntry", padding=5)
-        stilus.configure("TNotebook", background="#eef3f8", borderwidth=0)
+        stilus.configure("TNotebook", background="#f4f4f1", borderwidth=0)
         stilus.configure(
             "TNotebook.Tab",
             padding=(16, 9),
@@ -55,19 +55,57 @@ class EVKEszkozNyilvantarto:
         stilus.map(
             "TNotebook.Tab",
             background=[
-                ("selected", "#ffffff"),
-                ("active", "#d9eaf7")
+                ("selected", "#486a50"),
+                ("active", "#e6ede8")
             ],
-            foreground=[("selected", "#17365d")]
+            foreground=[("selected", "#ffffff")]
+        )
+        stilus.configure(
+            "Welcome.TFrame",
+            background="#ffffff",
+            bordercolor="#d6d8d3",
+            relief="solid",
+            borderwidth=1
+        )
+        stilus.configure(
+            "HomeTitle.TLabel",
+            background="#ffffff",
+            foreground="#252a26",
+            font=("Segoe UI", 24, "bold")
+        )
+        stilus.configure(
+            "HomeText.TLabel",
+            background="#ffffff",
+            foreground="#66716a",
+            font=("Segoe UI", 11)
+        )
+        stilus.configure(
+            "Accent.TButton",
+            background="#486a50",
+            foreground="#ffffff",
+            padding=(18, 12),
+            font=("Segoe UI", 10, "bold"),
+            borderwidth=0
+        )
+        stilus.map(
+            "Accent.TButton",
+            background=[
+                ("active", "#3b5843"),
+                ("pressed", "#314738")
+            ],
+            foreground=[("active", "#ffffff"), ("pressed", "#ffffff")]
         )
         stilus.configure(
             "TButton",
-            padding=(10, 6),
-            font=("Segoe UI", 9)
+            background="#e9ebe7",
+            foreground="#303632",
+            padding=(10, 7),
+            font=("Segoe UI", 9),
+            borderwidth=0
         )
         stilus.map(
             "TButton",
-            background=[("active", "#d9eaf7"), ("pressed", "#bfd7e8")]
+            background=[("active", "#dce3dc"), ("pressed", "#cbd5cc")]
         )
         stilus.configure(
             "Treeview",
@@ -76,23 +114,23 @@ class EVKEszkozNyilvantarto:
             foreground="#253247",
             rowheight=27,
             font=("Segoe UI", 10),
-            bordercolor="#cbd5e1"
+            bordercolor="#d6d8d3"
         )
         stilus.configure(
             "Treeview.Heading",
-            background="#d8e6f3",
-            foreground="#17365d",
+            background="#e7ebe5",
+            foreground="#34443a",
             font=("Segoe UI", 10, "bold"),
             relief="flat",
             padding=(6, 7)
         )
         stilus.map(
             "Treeview.Heading",
-            background=[("active", "#c5d9eb")]
+            background=[("active", "#d8e0d7")]
         )
         stilus.map(
             "Treeview",
-            background=[("selected", "#2f75b5")],
+            background=[("selected", "#486a50")],
             foreground=[("selected", "#ffffff")]
         )
 
@@ -124,13 +162,17 @@ class EVKEszkozNyilvantarto:
         self.notebook.add(self.eszkoz_oldal, text="Eszközök")
         self.notebook.add(self.naplo_oldal, text="Karbantartási napló")
 
-        kezdo_tartalom = ttk.Frame(self.kezdolap_oldal)
+        kezdo_tartalom = ttk.Frame(
+            self.kezdolap_oldal,
+            padding=(48, 40),
+            style="Welcome.TFrame"
+        )
         kezdo_tartalom.pack(expand=True)
 
         ttk.Label(
             kezdo_tartalom,
             text="Eszköznyilvántartó",
-            font=("Segoe UI", 22, "bold")
+            style="HomeTitle.TLabel"
         ).pack(pady=(0, 10))
         ttk.Label(
             kezdo_tartalom,
@@ -139,18 +181,21 @@ class EVKEszkozNyilvantarto:
                 "Az eszközök és a karbantartási bejegyzések kezelése "
                 "külön oldalon található."
             ),
-            justify="center"
+            justify="center",
+            style="HomeText.TLabel"
         ).pack(pady=(0, 24))
         ttk.Button(
             kezdo_tartalom,
             text="Eszközök kezelése",
             command=lambda: self.notebook.select(self.eszkoz_oldal),
+            style="Accent.TButton",
             width=30
         ).pack(pady=8)
         ttk.Button(
             kezdo_tartalom,
             text="Karbantartási napló megnyitása",
             command=lambda: self.notebook.select(self.naplo_oldal),
+            style="Accent.TButton",
             width=30
         ).pack(pady=8)
 
@@ -227,7 +272,7 @@ class EVKEszkozNyilvantarto:
             show="headings",
             height=6
         )
-        self.lista.tag_configure("paros", background="#f3f7fb")
+        self.lista.tag_configure("paros", background="#f1f4ef")
         self.lista.tag_configure("paratlan", background="#ffffff")
         self.lista.heading(
             "id",
@@ -347,7 +392,7 @@ class EVKEszkozNyilvantarto:
             show="headings",
             height=6
         )
-        self.karb_lista.tag_configure("paros", background="#f3f7fb")
+        self.karb_lista.tag_configure("paros", background="#f1f4ef")
         self.karb_lista.tag_configure("paratlan", background="#ffffff")
         self.karb_lista.heading(
             "id",
