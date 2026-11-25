@@ -11,6 +11,7 @@ class EVKEszkozNyilvantarto:
         self.root.title("Eszköznyilvántartó és karbantartási napló")
         self.root.geometry("850x800")
         self.root.protocol("WM_DELETE_WINDOW", self.evk_ablak_bezarasa)
+        self.evk_stilus_beallitasa()
 
         self.kapcsolat = sqlite3.connect("eszkozok.db")
         self.kapcsolat.execute("PRAGMA foreign_keys = ON")
@@ -18,6 +19,82 @@ class EVKEszkozNyilvantarto:
         self.evk_adatbazis_elokeszitese()
         self.evk_felulet_elkeszitese()
         self.evk_lista_frissitese()
+
+    def evk_stilus_beallitasa(self):
+        stilus = ttk.Style(self.root)
+        if "clam" in stilus.theme_names():
+            stilus.theme_use("clam")
+
+        self.root.configure(bg="#eef3f8")
+        stilus.configure(".", font=("Segoe UI", 10))
+        stilus.configure("TFrame", background="#eef3f8")
+        stilus.configure(
+            "TLabel",
+            background="#eef3f8",
+            foreground="#26364a"
+        )
+        stilus.configure(
+            "TLabelframe",
+            background="#eef3f8",
+            bordercolor="#cbd5e1",
+            relief="solid"
+        )
+        stilus.configure(
+            "TLabelframe.Label",
+            background="#eef3f8",
+            foreground="#1f4e79",
+            font=("Segoe UI", 11, "bold")
+        )
+        stilus.configure("TEntry", padding=5)
+        stilus.configure("TNotebook", background="#eef3f8", borderwidth=0)
+        stilus.configure(
+            "TNotebook.Tab",
+            padding=(16, 9),
+            font=("Segoe UI", 10, "bold")
+        )
+        stilus.map(
+            "TNotebook.Tab",
+            background=[
+                ("selected", "#ffffff"),
+                ("active", "#d9eaf7")
+            ],
+            foreground=[("selected", "#17365d")]
+        )
+        stilus.configure(
+            "TButton",
+            padding=(10, 6),
+            font=("Segoe UI", 9)
+        )
+        stilus.map(
+            "TButton",
+            background=[("active", "#d9eaf7"), ("pressed", "#bfd7e8")]
+        )
+        stilus.configure(
+            "Treeview",
+            background="#ffffff",
+            fieldbackground="#ffffff",
+            foreground="#253247",
+            rowheight=27,
+            font=("Segoe UI", 10),
+            bordercolor="#cbd5e1"
+        )
+        stilus.configure(
+            "Treeview.Heading",
+            background="#d8e6f3",
+            foreground="#17365d",
+            font=("Segoe UI", 10, "bold"),
+            relief="flat",
+            padding=(6, 7)
+        )
+        stilus.map(
+            "Treeview.Heading",
+            background=[("active", "#c5d9eb")]
+        )
+        stilus.map(
+            "Treeview",
+            background=[("selected", "#2f75b5")],
+            foreground=[("selected", "#ffffff")]
+        )
 
     def evk_adatbazis_elokeszitese(self):
         self.kapcsolat.execute(
@@ -36,8 +113,49 @@ class EVKEszkozNyilvantarto:
         self.kapcsolat.commit()
 
     def evk_felulet_elkeszitese(self):
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(fill="both", expand=True, padx=10, pady=10)
+
+        self.kezdolap_oldal = ttk.Frame(self.notebook)
+        self.eszkoz_oldal = ttk.Frame(self.notebook)
+        self.naplo_oldal = ttk.Frame(self.notebook)
+
+        self.notebook.add(self.kezdolap_oldal, text="Kezdőlap")
+        self.notebook.add(self.eszkoz_oldal, text="Eszközök")
+        self.notebook.add(self.naplo_oldal, text="Karbantartási napló")
+
+        kezdo_tartalom = ttk.Frame(self.kezdolap_oldal)
+        kezdo_tartalom.pack(expand=True)
+
+        ttk.Label(
+            kezdo_tartalom,
+            text="Eszköznyilvántartó",
+            font=("Segoe UI", 22, "bold")
+        ).pack(pady=(0, 10))
+        ttk.Label(
+            kezdo_tartalom,
+            text=(
+                "Válaszd ki, melyik részt szeretnéd megnyitni.\n"
+                "Az eszközök és a karbantartási bejegyzések kezelése "
+                "külön oldalon található."
+            ),
+            justify="center"
+        ).pack(pady=(0, 24))
+        ttk.Button(
+            kezdo_tartalom,
+            text="Eszközök kezelése",
+            command=lambda: self.notebook.select(self.eszkoz_oldal),
+            width=30
+        ).pack(pady=8)
+        ttk.Button(
+            kezdo_tartalom,
+            text="Karbantartási napló megnyitása",
+            command=lambda: self.notebook.select(self.naplo_oldal),
+            width=30
+        ).pack(pady=8)
+
         eszkoz_frame = ttk.LabelFrame(
-            self.root,
+            self.eszkoz_oldal,
             text="Eszközök",
             padding=10
         )
@@ -100,12 +218,17 @@ class EVKEszkozNyilvantarto:
         )
         self.ossz_eszkoz_cimke.pack(anchor="w", pady=(5, 0))
 
+        lista_frame = ttk.Frame(eszkoz_frame)
+        lista_frame.pack(fill="both", expand=True, pady=10)
+
         self.lista = ttk.Treeview(
-            eszkoz_frame,
+            lista_frame,
             columns=("id", "nev", "kategoria"),
             show="headings",
             height=6
         )
+        self.lista.tag_configure("paros", background="#f3f7fb")
+        self.lista.tag_configure("paratlan", background="#ffffff")
         self.lista.heading(
             "id",
             text="Azonosító",
@@ -125,7 +248,14 @@ class EVKEszkozNyilvantarto:
             "<<TreeviewSelect>>",
             self.evk_kijelolt_eszkoz_betoltese
         )
-        self.lista.pack(fill="both", expand=True, pady=10)
+        lista_scrollbar = ttk.Scrollbar(
+            lista_frame,
+            orient="vertical",
+            command=self.lista.yview
+        )
+        self.lista.configure(yscrollcommand=lista_scrollbar.set)
+        self.lista.pack(side="left", fill="both", expand=True)
+        lista_scrollbar.pack(side="right", fill="y")
 
         ttk.Button(
             eszkoz_frame,
@@ -140,7 +270,7 @@ class EVKEszkozNyilvantarto:
         ).pack(pady=5)
 
         naplo_frame = ttk.LabelFrame(
-            self.root,
+            self.naplo_oldal,
             text="Karbantartási napló",
             padding=10
         )
@@ -208,12 +338,17 @@ class EVKEszkozNyilvantarto:
         )
         self.karb_db_cimke.pack(anchor="w", pady=(5, 0))
 
+        karb_lista_frame = ttk.Frame(naplo_frame)
+        karb_lista_frame.pack(fill="both", expand=True, pady=10)
+
         self.karb_lista = ttk.Treeview(
-            naplo_frame,
+            karb_lista_frame,
             columns=("id", "datum", "eszkoz", "leiras"),
             show="headings",
             height=6
         )
+        self.karb_lista.tag_configure("paros", background="#f3f7fb")
+        self.karb_lista.tag_configure("paratlan", background="#ffffff")
         self.karb_lista.heading(
             "id",
             text="Azonosító",
@@ -238,7 +373,14 @@ class EVKEszkozNyilvantarto:
             "<<TreeviewSelect>>",
             self.evk_kijelolt_karbantartas_betoltese
         )
-        self.karb_lista.pack(fill="both", expand=True, pady=10)
+        karb_scrollbar = ttk.Scrollbar(
+            karb_lista_frame,
+            orient="vertical",
+            command=self.karb_lista.yview
+        )
+        self.karb_lista.configure(yscrollcommand=karb_scrollbar.set)
+        self.karb_lista.pack(side="left", fill="both", expand=True)
+        karb_scrollbar.pack(side="right", fill="y")
 
         ttk.Button(
             naplo_frame,
@@ -317,8 +459,14 @@ class EVKEszkozNyilvantarto:
             (minta, minta)
         ).fetchall()
 
-        for eszkoz in eszkozok:
-            self.lista.insert("", tk.END, values=eszkoz)
+        for index, eszkoz in enumerate(eszkozok):
+            cimke = "paros" if index % 2 == 0 else "paratlan"
+            self.lista.insert(
+                "",
+                tk.END,
+                values=eszkoz,
+                tags=(cimke,)
+            )
 
         self.evk_eszkoz_db_frissitese()
         self.evk_karbantartas_lista_frissitese()
@@ -430,11 +578,12 @@ class EVKEszkozNyilvantarto:
             )
         )
 
-        for bejegyzes in bejegyzesek:
+        for index, bejegyzes in enumerate(bejegyzesek):
             datum = datetime.strptime(
                 bejegyzes[1],
                 "%Y-%m-%d"
             ).strftime("%Y.%m.%d.")
+            cimke = "paros" if index % 2 == 0 else "paratlan"
             self.karb_lista.insert(
                 "",
                 tk.END,
@@ -443,7 +592,8 @@ class EVKEszkozNyilvantarto:
                     datum,
                     bejegyzes[2],
                     bejegyzes[3]
-                )
+                ),
+                tags=(cimke,)
             )
 
     def evk_eszkoz_lista_rendezese(self, oszlop, forditott=False):
