@@ -3,6 +3,7 @@ import sqlite3
 import tkinter as tk
 from datetime import date, datetime
 from tkinter import filedialog, messagebox, ttk
+from pathlib import Path
 
 
 class EVKEszkozNyilvantarto:
@@ -988,8 +989,12 @@ class EVKEszkozNyilvantarto:
             )
             return
 
+        export_mappa = Path(__file__).resolve().parent / "mintakimenetek"
+        export_mappa.mkdir(exist_ok=True)
         fajlnev = filedialog.asksaveasfilename(
             title="Karbantartási napló mentése",
+            initialdir=str(export_mappa),
+            initialfile="karbantartasi_naplo.csv",
             defaultextension=".csv",
             filetypes=[("CSV-fájl", "*.csv")]
         )
@@ -1079,8 +1084,11 @@ class EVKEszkozNyilvantarto:
             )
             return
 
+        export_mappa = Path(__file__).resolve().parent / "mintakimenetek"
+        export_mappa.mkdir(exist_ok=True)
         fajlnev = filedialog.asksaveasfilename(
             title="Eszközlista mentése",
+            initialdir=str(export_mappa),
             initialfile="eszkozlista.csv",
             defaultextension=".csv",
             filetypes=[("CSV-fájl", "*.csv")]
