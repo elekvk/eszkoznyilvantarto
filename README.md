@@ -43,13 +43,13 @@ A grafikus felület és az eseménykezelés megvalósítására szolgál.
 
 ### Bemutatandó modul: `sqlite3`
 
-Az SQLite-adatbázis kezelésére szolgál.
+Az SQLite-adatbázis kezelésére szolgál. A program a modul függvényét és az adatbázis-kapcsolat metódusait használja.
 
 - `sqlite3.connect("eszkozok.db")` – kapcsolat létrehozása az adatbázissal
-- `execute()` – SQL-parancs végrehajtása
-- `commit()` – az adatbázis módosításainak mentése
-- `fetchone()` – egy lekérdezési eredmény beolvasása
-- `fetchall()` – a lekérdezési eredmények beolvasása
+- `self.kapcsolat.execute(...)` – SQL-parancs végrehajtása
+- `self.kapcsolat.commit()` – adatbázis-módosítások mentése
+- `.fetchone()` – egy lekérdezési eredmény beolvasása
+- `.fetchall()` – a lekérdezési eredmények beolvasása
 
 ### További használt modulok
 

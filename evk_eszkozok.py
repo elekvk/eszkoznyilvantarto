@@ -26,113 +26,169 @@ class EVKEszkozNyilvantarto:
         if "clam" in stilus.theme_names():
             stilus.theme_use("clam")
 
-        self.root.configure(bg="#f4f4f1")
+        self.root.configure(bg="#F3F6F3")
         stilus.configure(".", font=("Segoe UI", 10))
-        stilus.configure("TFrame", background="#f4f4f1")
+        stilus.configure("TFrame", background="#F3F6F3")
         stilus.configure(
             "TLabel",
-            background="#f4f4f1",
-            foreground="#303632"
+            background="#F3F6F3",
+            foreground="#26332B"
         )
         stilus.configure(
             "TLabelframe",
-            background="#f4f4f1",
-            bordercolor="#d6d8d3",
+            background="#FFFFFF",
+            bordercolor="#DCE5DE",
+            borderwidth=1,
             relief="solid"
         )
         stilus.configure(
             "TLabelframe.Label",
-            background="#f4f4f1",
-            foreground="#486a50",
+            background="#FFFFFF",
+            foreground="#277A55",
             font=("Segoe UI", 11, "bold")
         )
-        stilus.configure("TEntry", padding=5)
-        stilus.configure("TNotebook", background="#f4f4f1", borderwidth=0)
+        stilus.configure(
+            "TEntry",
+            padding=7,
+            fieldbackground="#FFFFFF",
+            foreground="#26332B",
+            bordercolor="#D4DED6",
+            lightcolor="#D4DED6",
+            darkcolor="#D4DED6"
+        )
+        stilus.map(
+            "TEntry",
+            bordercolor=[("focus", "#4B9B70")],
+            lightcolor=[("focus", "#4B9B70")],
+            darkcolor=[("focus", "#4B9B70")]
+        )
+        stilus.configure("TNotebook", background="#F3F6F3", borderwidth=0)
         stilus.configure(
             "TNotebook.Tab",
-            padding=(16, 9),
-            font=("Segoe UI", 10, "bold")
+            padding=(18, 10),
+            font=("Segoe UI", 10, "bold"),
+            background="#E8EEE9",
+            foreground="#526158"
         )
         stilus.map(
             "TNotebook.Tab",
             background=[
-                ("selected", "#486a50"),
-                ("active", "#e6ede8")
+                ("selected", "#FFFFFF"),
+                ("active", "#DFEAE1")
             ],
-            foreground=[("selected", "#ffffff")]
+            foreground=[
+                ("selected", "#277A55"),
+                ("active", "#26332B")
+            ]
+        )
+        stilus.configure(
+            "Header.TFrame",
+            background="#FFFFFF"
+        )
+        stilus.configure(
+            "HeaderTitle.TLabel",
+            background="#FFFFFF",
+            foreground="#20352A",
+            font=("Segoe UI", 19, "bold")
+        )
+        stilus.configure(
+            "HeaderSubtitle.TLabel",
+            background="#FFFFFF",
+            foreground="#6A786F",
+            font=("Segoe UI", 10)
         )
         stilus.configure(
             "Welcome.TFrame",
-            background="#ffffff",
-            bordercolor="#d6d8d3",
+            background="#FFFFFF",
+            bordercolor="#DCE5DE",
             relief="solid",
             borderwidth=1
         )
         stilus.configure(
             "HomeTitle.TLabel",
-            background="#ffffff",
-            foreground="#252a26",
-            font=("Segoe UI", 24, "bold")
+            background="#FFFFFF",
+            foreground="#20352A",
+            font=("Segoe UI", 23, "bold")
         )
         stilus.configure(
             "HomeText.TLabel",
-            background="#ffffff",
-            foreground="#66716a",
+            background="#FFFFFF",
+            foreground="#69776E",
             font=("Segoe UI", 11)
         )
         stilus.configure(
+            "Card.TFrame",
+            background="#FFFFFF",
+            bordercolor="#DCE5DE",
+            relief="solid",
+            borderwidth=1
+        )
+        stilus.configure(
+            "CardTitle.TLabel",
+            background="#FFFFFF",
+            foreground="#26332B",
+            font=("Segoe UI", 14, "bold")
+        )
+        stilus.configure(
+            "CardText.TLabel",
+            background="#FFFFFF",
+            foreground="#69776E",
+            font=("Segoe UI", 10)
+        )
+        stilus.configure(
             "Accent.TButton",
-            background="#486a50",
-            foreground="#ffffff",
-            padding=(18, 12),
+            background="#277A55",
+            foreground="#FFFFFF",
+            padding=(16, 10),
             font=("Segoe UI", 10, "bold"),
             borderwidth=0
         )
         stilus.map(
             "Accent.TButton",
             background=[
-                ("active", "#3b5843"),
-                ("pressed", "#314738")
+                ("active", "#206746"),
+                ("pressed", "#19563A")
             ],
-            foreground=[("active", "#ffffff"), ("pressed", "#ffffff")]
+            foreground=[("active", "#FFFFFF"), ("pressed", "#FFFFFF")]
         )
         stilus.configure(
             "TButton",
-            background="#e9ebe7",
-            foreground="#303632",
-            padding=(10, 7),
-            font=("Segoe UI", 9),
+            background="#E8EEE9",
+            foreground="#304137",
+            padding=(11, 8),
+            font=("Segoe UI", 9, "bold"),
             borderwidth=0
         )
         stilus.map(
             "TButton",
-            background=[("active", "#dce3dc"), ("pressed", "#cbd5cc")]
+            background=[("active", "#DCE8DE"), ("pressed", "#D1DFD4")],
+            foreground=[("active", "#20352A"), ("pressed", "#20352A")]
         )
         stilus.configure(
             "Treeview",
-            background="#ffffff",
-            fieldbackground="#ffffff",
-            foreground="#253247",
-            rowheight=27,
+            background="#FFFFFF",
+            fieldbackground="#FFFFFF",
+            foreground="#2D3931",
+            rowheight=30,
             font=("Segoe UI", 10),
-            bordercolor="#d6d8d3"
+            bordercolor="#DCE5DE"
         )
         stilus.configure(
             "Treeview.Heading",
-            background="#e7ebe5",
-            foreground="#34443a",
+            background="#E8EEE9",
+            foreground="#34483A",
             font=("Segoe UI", 10, "bold"),
             relief="flat",
-            padding=(6, 7)
+            padding=(8, 8)
         )
         stilus.map(
             "Treeview.Heading",
-            background=[("active", "#d8e0d7")]
+            background=[("active", "#DCE8DE")]
         )
         stilus.map(
             "Treeview",
-            background=[("selected", "#486a50")],
-            foreground=[("selected", "#ffffff")]
+            background=[("selected", "#277A55")],
+            foreground=[("selected", "#FFFFFF")]
         )
 
     def evk_adatbazis_elokeszitese(self):
@@ -152,8 +208,21 @@ class EVKEszkozNyilvantarto:
         self.kapcsolat.commit()
 
     def evk_felulet_elkeszitese(self):
+        fejlec = ttk.Frame(self.root, style="Header.TFrame", padding=(24, 16))
+        fejlec.pack(fill="x", padx=14, pady=(14, 0))
+        ttk.Label(
+            fejlec,
+            text="Eszköznyilvántartó",
+            style="HeaderTitle.TLabel"
+        ).pack(anchor="w")
+        ttk.Label(
+            fejlec,
+            text="Eszközök és karbantartási előzmények egy helyen",
+            style="HeaderSubtitle.TLabel"
+        ).pack(anchor="w", pady=(3, 0))
+
         self.notebook = ttk.Notebook(self.root)
-        self.notebook.pack(fill="both", expand=True, padx=10, pady=10)
+        self.notebook.pack(fill="both", expand=True, padx=14, pady=14)
 
         self.kezdolap_oldal = ttk.Frame(self.notebook)
         self.eszkoz_oldal = ttk.Frame(self.notebook)
@@ -163,49 +232,98 @@ class EVKEszkozNyilvantarto:
         self.notebook.add(self.eszkoz_oldal, text="Eszközök")
         self.notebook.add(self.naplo_oldal, text="Karbantartási napló")
 
-        kezdo_tartalom = ttk.Frame(
-            self.kezdolap_oldal,
-            padding=(48, 40),
+        kezdo_tartalom = ttk.Frame(self.kezdolap_oldal, padding=24)
+        kezdo_tartalom.pack(fill="both", expand=True)
+
+        udvozlo = ttk.Frame(
+            kezdo_tartalom,
+            padding=(30, 26),
             style="Welcome.TFrame"
         )
-        kezdo_tartalom.pack(expand=True)
+        udvozlo.pack(fill="x", pady=(0, 18))
+        ttk.Label(
+            udvozlo,
+            text="Üdvözlünk!",
+            style="HomeTitle.TLabel"
+        ).pack(anchor="w", pady=(0, 8))
+        ttk.Label(
+            udvozlo,
+            text=(
+                "Itt kezelheted a nyilvántartott eszközöket és "
+                "a hozzájuk tartozó karbantartási bejegyzéseket."
+            ),
+            style="HomeText.TLabel",
+            wraplength=760,
+            justify="left"
+        ).pack(anchor="w")
 
         ttk.Label(
             kezdo_tartalom,
-            text="Eszköznyilvántartó",
-            style="HomeTitle.TLabel"
-        ).pack(pady=(0, 10))
+            text="Gyors elérés",
+            style="CardTitle.TLabel"
+        ).pack(anchor="w", pady=(0, 10))
+
+        gyors_eleres = ttk.Frame(kezdo_tartalom)
+        gyors_eleres.pack(fill="x")
+        gyors_eleres.columnconfigure(0, weight=1)
+        gyors_eleres.columnconfigure(1, weight=1)
+
+        eszkoz_kartya = ttk.Frame(
+            gyors_eleres,
+            style="Card.TFrame",
+            padding=20
+        )
+        eszkoz_kartya.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
         ttk.Label(
-            kezdo_tartalom,
-            text=(
-                "Válaszd ki, melyik részt szeretnéd megnyitni.\n"
-                "Az eszközök és a karbantartási bejegyzések kezelése "
-                "külön oldalon található."
-            ),
-            justify="center",
-            style="HomeText.TLabel"
-        ).pack(pady=(0, 24))
+            eszkoz_kartya,
+            text="Eszközök",
+            style="CardTitle.TLabel"
+        ).pack(anchor="w", pady=(0, 6))
+        ttk.Label(
+            eszkoz_kartya,
+            text="Eszközök felvétele, keresése, módosítása és törlése.",
+            style="CardText.TLabel",
+            wraplength=360,
+            justify="left"
+        ).pack(anchor="w", pady=(0, 16))
         ttk.Button(
-            kezdo_tartalom,
-            text="Eszközök kezelése",
+            eszkoz_kartya,
+            text="Eszközök megnyitása",
             command=lambda: self.notebook.select(self.eszkoz_oldal),
-            style="Accent.TButton",
-            width=30
-        ).pack(pady=8)
+            style="Accent.TButton"
+        ).pack(anchor="w")
+
+        naplo_kartya = ttk.Frame(
+            gyors_eleres,
+            style="Card.TFrame",
+            padding=20
+        )
+        naplo_kartya.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
+        ttk.Label(
+            naplo_kartya,
+            text="Karbantartási napló",
+            style="CardTitle.TLabel"
+        ).pack(anchor="w", pady=(0, 6))
+        ttk.Label(
+            naplo_kartya,
+            text="Karbantartások rögzítése, keresése és exportálása.",
+            style="CardText.TLabel",
+            wraplength=360,
+            justify="left"
+        ).pack(anchor="w", pady=(0, 16))
         ttk.Button(
-            kezdo_tartalom,
-            text="Karbantartási napló megnyitása",
+            naplo_kartya,
+            text="Napló megnyitása",
             command=lambda: self.notebook.select(self.naplo_oldal),
-            style="Accent.TButton",
-            width=30
-        ).pack(pady=8)
+            style="Accent.TButton"
+        ).pack(anchor="w")
 
         eszkoz_frame = ttk.LabelFrame(
             self.eszkoz_oldal,
-            text="Eszközök",
-            padding=10
+            text="Eszközök kezelése",
+            padding=14
         )
-        eszkoz_frame.pack(fill="both", expand=True, padx=10, pady=10)
+        eszkoz_frame.pack(fill="both", expand=True, padx=14, pady=14)
 
         beviteli_sor = ttk.Frame(eszkoz_frame)
         beviteli_sor.pack(fill="x")
@@ -233,38 +351,32 @@ class EVKEszkozNyilvantarto:
         ).grid(row=1, column=4, pady=5)
 
         kereso_sor = ttk.Frame(eszkoz_frame)
-        kereso_sor.pack(fill="x", pady=(5, 0))
-
+        kereso_sor.pack(fill="x", pady=(12, 0))
         ttk.Label(kereso_sor, text="Keresés:").pack(side="left")
         self.kereso_mezo = ttk.Entry(kereso_sor)
         self.kereso_mezo.pack(
             side="left",
             fill="x",
             expand=True,
-            padx=5
+            padx=8
         )
-        self.kereso_mezo.bind(
-            "<Return>",
-            self.evk_eszkoz_keresese
-        )
-
+        self.kereso_mezo.bind("<Return>", self.evk_eszkoz_keresese)
         ttk.Button(
             kereso_sor,
             text="Keresés",
             command=self.evk_eszkoz_keresese
-        ).pack(side="left", padx=5)
-
+        ).pack(side="left", padx=4)
         ttk.Button(
             kereso_sor,
             text="Összes eszköz",
             command=self.evk_osszes_eszkoz
-        ).pack(side="left")
+        ).pack(side="left", padx=(4, 0))
 
         self.ossz_eszkoz_cimke = ttk.Label(
             eszkoz_frame,
             text="Nyilvántartott eszközök száma: 0"
         )
-        self.ossz_eszkoz_cimke.pack(anchor="w", pady=(5, 0))
+        self.ossz_eszkoz_cimke.pack(anchor="w", pady=(12, 0))
 
         lista_frame = ttk.Frame(eszkoz_frame)
         lista_frame.pack(fill="both", expand=True, pady=10)
@@ -275,8 +387,8 @@ class EVKEszkozNyilvantarto:
             show="headings",
             height=6
         )
-        self.lista.tag_configure("paros", background="#f1f4ef")
-        self.lista.tag_configure("paratlan", background="#ffffff")
+        self.lista.tag_configure("paros", background="#F2F6F2")
+        self.lista.tag_configure("paratlan", background="#FFFFFF")
         self.lista.heading(
             "id",
             text="Azonosító",
@@ -292,10 +404,7 @@ class EVKEszkozNyilvantarto:
             text="Kategória",
             command=lambda: self.evk_eszkoz_lista_rendezese("kategoria")
         )
-        self.lista.bind(
-            "<<TreeviewSelect>>",
-            self.evk_kijelolt_eszkoz_betoltese
-        )
+        self.lista.bind("<<TreeviewSelect>>", self.evk_kijelolt_eszkoz_betoltese)
         lista_scrollbar = ttk.Scrollbar(
             lista_frame,
             orient="vertical",
@@ -305,24 +414,25 @@ class EVKEszkozNyilvantarto:
         self.lista.pack(side="left", fill="both", expand=True)
         lista_scrollbar.pack(side="right", fill="y")
 
+        eszkoz_muveletek = ttk.Frame(eszkoz_frame)
+        eszkoz_muveletek.pack(fill="x", pady=(4, 0))
         ttk.Button(
-            eszkoz_frame,
+            eszkoz_muveletek,
             text="Kijelölt eszköz törlése",
             command=self.evk_eszkoz_torlese
-        ).pack(pady=4)
-
+        ).pack(side="left", padx=(0, 8), pady=4)
         ttk.Button(
-            eszkoz_frame,
+            eszkoz_muveletek,
             text="Eszközlista mentése CSV-fájlba",
             command=self.evk_eszkozok_exportalasa
-        ).pack(pady=4)
+        ).pack(side="left", padx=8, pady=4)
 
         naplo_frame = ttk.LabelFrame(
             self.naplo_oldal,
-            text="Karbantartási napló",
-            padding=10
+            text="Karbantartási napló kezelése",
+            padding=14
         )
-        naplo_frame.pack(fill="both", expand=True, padx=10, pady=(0, 10))
+        naplo_frame.pack(fill="both", expand=True, padx=14, pady=14)
 
         naplo_bevitel = ttk.Frame(naplo_frame)
         naplo_bevitel.pack(fill="x")
@@ -334,10 +444,7 @@ class EVKEszkozNyilvantarto:
         )
         self.datum_mezo = ttk.Entry(naplo_bevitel, width=14)
         self.datum_mezo.grid(row=0, column=1, padx=5)
-        self.datum_mezo.insert(
-            0,
-            date.today().strftime("%Y.%m.%d.")
-        )
+        self.datum_mezo.insert(0, date.today().strftime("%Y.%m.%d."))
 
         ttk.Label(naplo_bevitel, text="Leírás:").grid(row=0, column=2)
         self.leiras_mezo = ttk.Entry(naplo_bevitel, width=35)
@@ -350,42 +457,35 @@ class EVKEszkozNyilvantarto:
         ).grid(row=0, column=4, padx=5)
 
         karb_kereso_sor = ttk.Frame(naplo_frame)
-        karb_kereso_sor.pack(fill="x", pady=(5, 0))
-
-        ttk.Label(
-            karb_kereso_sor,
-            text="Napló keresése:"
-        ).pack(side="left")
-
+        karb_kereso_sor.pack(fill="x", pady=(12, 0))
+        ttk.Label(karb_kereso_sor, text="Napló keresése:").pack(side="left")
         self.karb_kereso_mezo = ttk.Entry(karb_kereso_sor)
         self.karb_kereso_mezo.pack(
             side="left",
             fill="x",
             expand=True,
-            padx=5
+            padx=8
         )
         self.karb_kereso_mezo.bind(
             "<Return>",
             self.evk_karbantartas_keresese
         )
-
         ttk.Button(
             karb_kereso_sor,
             text="Keresés",
             command=self.evk_karbantartas_keresese
-        ).pack(side="left", padx=5)
-
+        ).pack(side="left", padx=4)
         ttk.Button(
             karb_kereso_sor,
             text="Teljes napló",
             command=self.evk_teljes_karbantartasi_naplo
-        ).pack(side="left")
+        ).pack(side="left", padx=(4, 0))
 
         self.karb_db_cimke = ttk.Label(
             naplo_frame,
             text="Megjelenített naplóbejegyzések száma: 0"
         )
-        self.karb_db_cimke.pack(anchor="w", pady=(5, 0))
+        self.karb_db_cimke.pack(anchor="w", pady=(12, 0))
 
         karb_lista_frame = ttk.Frame(naplo_frame)
         karb_lista_frame.pack(fill="both", expand=True, pady=10)
@@ -396,8 +496,8 @@ class EVKEszkozNyilvantarto:
             show="headings",
             height=6
         )
-        self.karb_lista.tag_configure("paros", background="#f1f4ef")
-        self.karb_lista.tag_configure("paratlan", background="#ffffff")
+        self.karb_lista.tag_configure("paros", background="#F2F6F2")
+        self.karb_lista.tag_configure("paratlan", background="#FFFFFF")
         self.karb_lista.heading(
             "id",
             text="Azonosító",
@@ -431,23 +531,23 @@ class EVKEszkozNyilvantarto:
         self.karb_lista.pack(side="left", fill="both", expand=True)
         karb_scrollbar.pack(side="right", fill="y")
 
+        naplo_muveletek = ttk.Frame(naplo_frame)
+        naplo_muveletek.pack(fill="x", pady=(4, 0))
         ttk.Button(
-            naplo_frame,
-            text="Kijelölt naplóbejegyzés törlése",
+            naplo_muveletek,
+            text="Kijelölt bejegyzés törlése",
             command=self.evk_karbantartas_torlese
-        ).pack(pady=4)
-
+        ).pack(side="left", padx=(0, 8), pady=4)
         ttk.Button(
-            naplo_frame,
-            text="Kijelölt naplóbejegyzés módosítása",
+            naplo_muveletek,
+            text="Kijelölt bejegyzés módosítása",
             command=self.evk_karbantartas_modositasa
-        ).pack(pady=4)
-
+        ).pack(side="left", padx=8, pady=4)
         ttk.Button(
-            naplo_frame,
-            text="Karbantartási napló mentése CSV-fájlba",
+            naplo_muveletek,
+            text="Napló mentése CSV-fájlba",
             command=self.evk_karbantartas_exportalasa
-        ).pack(pady=4)
+        ).pack(side="left", padx=8, pady=4)
 
     def evk_datum_atalakitasa(self, datum):
         for formatum in ("%Y.%m.%d.", "%Y.%m.%d"):
