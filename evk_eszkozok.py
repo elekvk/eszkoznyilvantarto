@@ -136,6 +136,18 @@ class EVKEszkozNyilvantarto:
             font=("Segoe UI", 10)
         )
         stilus.configure(
+            "StatCaption.TLabel",
+            background="#FFFFFF",
+            foreground="#69776E",
+            font=("Segoe UI", 9, "bold")
+        )
+        stilus.configure(
+            "StatValue.TLabel",
+            background="#FFFFFF",
+            foreground="#277A55",
+            font=("Segoe UI", 22, "bold")
+        )
+        stilus.configure(
             "Accent.TButton",
             background="#277A55",
             foreground="#FFFFFF",
@@ -256,6 +268,65 @@ class EVKEszkozNyilvantarto:
             wraplength=760,
             justify="left"
         ).pack(anchor="w")
+
+        statisztikak = ttk.Frame(kezdo_tartalom)
+        statisztikak.pack(fill="x", pady=(0, 22))
+        for oszlop in range(3):
+            statisztikak.columnconfigure(oszlop, weight=1)
+
+        eszkoz_stat = ttk.Frame(
+            statisztikak,
+            style="Card.TFrame",
+            padding=(18, 15)
+        )
+        eszkoz_stat.grid(row=0, column=0, sticky="nsew", padx=(0, 8))
+        ttk.Label(
+            eszkoz_stat,
+            text="NYILVÁNTARTOTT ESZKÖZÖK",
+            style="StatCaption.TLabel"
+        ).pack(anchor="w")
+        self.kezdolap_eszkoz_szam = ttk.Label(
+            eszkoz_stat,
+            text="0",
+            style="StatValue.TLabel"
+        )
+        self.kezdolap_eszkoz_szam.pack(anchor="w", pady=(4, 0))
+
+        naplo_stat = ttk.Frame(
+            statisztikak,
+            style="Card.TFrame",
+            padding=(18, 15)
+        )
+        naplo_stat.grid(row=0, column=1, sticky="nsew", padx=8)
+        ttk.Label(
+            naplo_stat,
+            text="NAPLÓBEJEGYZÉSEK",
+            style="StatCaption.TLabel"
+        ).pack(anchor="w")
+        self.kezdolap_naplo_szam = ttk.Label(
+            naplo_stat,
+            text="0",
+            style="StatValue.TLabel"
+        )
+        self.kezdolap_naplo_szam.pack(anchor="w", pady=(4, 0))
+
+        utolso_stat = ttk.Frame(
+            statisztikak,
+            style="Card.TFrame",
+            padding=(18, 15)
+        )
+        utolso_stat.grid(row=0, column=2, sticky="nsew", padx=(8, 0))
+        ttk.Label(
+            utolso_stat,
+            text="LEGUTÓBBI KARBANTARTÁS",
+            style="StatCaption.TLabel"
+        ).pack(anchor="w")
+        self.kezdolap_utolso_datum = ttk.Label(
+            utolso_stat,
+            text="Nincs adat",
+            style="CardTitle.TLabel"
+        )
+        self.kezdolap_utolso_datum.pack(anchor="w", pady=(8, 0))
 
         ttk.Label(
             kezdo_tartalom,
@@ -744,6 +815,32 @@ class EVKEszkozNyilvantarto:
                 ),
                 tags=(cimke,)
             )
+
+        self.evk_kezdolap_statisztika_frissitese()
+
+    def evk_kezdolap_statisztika_frissitese(self):
+        eszkoz_db = self.kapcsolat.execute(
+            "SELECT COUNT(*) FROM eszkozok"
+        ).fetchone()[0]
+        naplo_db = self.kapcsolat.execute(
+            "SELECT COUNT(*) FROM karbantartas"
+        ).fetchone()[0]
+        utolso_datum = self.kapcsolat.execute(
+            "SELECT MAX(datum) FROM karbantartas"
+        ).fetchone()[0]
+
+        self.kezdolap_eszkoz_szam.config(text=str(eszkoz_db))
+        self.kezdolap_naplo_szam.config(text=str(naplo_db))
+
+        if utolso_datum:
+            megjelenitett_datum = datetime.strptime(
+                utolso_datum,
+                "%Y-%m-%d"
+            ).strftime("%Y.%m.%d.")
+        else:
+            megjelenitett_datum = "Nincs adat"
+
+        self.kezdolap_utolso_datum.config(text=megjelenitett_datum)
 
     def evk_eszkoz_lista_rendezese(self, oszlop, forditott=False):
         sorok = [
