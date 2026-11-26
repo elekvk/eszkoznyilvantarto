@@ -58,7 +58,7 @@ Az SQLite-adatbázis kezelésére szolgál. A program a modul függvényét, val
 - `datetime` – dátum lekérése, ellenőrzése és átalakítása: `date.today()`, `datetime.strptime()`, `strftime()`, `isoformat()`
 - `csv` – CSV-fájl készítése: `csv.writer()`, `writerow()`, `writerows()`
 - `filedialog` – mentési ablak megnyitása: `asksaveasfilename()`
-- `messagebox` – figyelmeztetések, megerősítések és visszajelzések megjelenítése
+- `messagebox` – figyelmeztetések, megerősítések és visszajelzések megjelenítése: `showwarning()`, `askyesno()`, `showerror()`, `showinfo()`
 - `pathlib` – a projektmappa meghatározása és a `mintakimenetek` mappa létrehozása: `Path(__file__).resolve().parent`, `mkdir()`
 
 ## Saját modul, osztály és metódusok
