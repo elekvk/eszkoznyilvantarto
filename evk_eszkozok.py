@@ -9,7 +9,8 @@ class EVKEszkozNyilvantarto:
     def __init__(self, root):
         self.root = root
         self.root.title("Eszköznyilvántartó és karbantartási napló")
-        self.root.geometry("850x800")
+        self.root.geometry("1100x850")
+        self.root.minsize(900, 700)
         self.root.protocol("WM_DELETE_WINDOW", self.evk_ablak_bezarasa)
         self.evk_stilus_beallitasa()
 
@@ -208,14 +209,16 @@ class EVKEszkozNyilvantarto:
 
         beviteli_sor = ttk.Frame(eszkoz_frame)
         beviteli_sor.pack(fill="x")
+        beviteli_sor.columnconfigure(1, weight=1)
+        beviteli_sor.columnconfigure(3, weight=1)
 
         ttk.Label(beviteli_sor, text="Eszköz neve:").grid(row=0, column=0)
         self.nev_mezo = ttk.Entry(beviteli_sor)
-        self.nev_mezo.grid(row=0, column=1, padx=5)
+        self.nev_mezo.grid(row=0, column=1, padx=5, sticky="ew")
 
         ttk.Label(beviteli_sor, text="Kategória:").grid(row=0, column=2)
         self.kategoria_mezo = ttk.Entry(beviteli_sor)
-        self.kategoria_mezo.grid(row=0, column=3, padx=5)
+        self.kategoria_mezo.grid(row=0, column=3, padx=5, sticky="ew")
 
         ttk.Button(
             beviteli_sor,
@@ -306,13 +309,13 @@ class EVKEszkozNyilvantarto:
             eszkoz_frame,
             text="Kijelölt eszköz törlése",
             command=self.evk_eszkoz_torlese
-        ).pack()
+        ).pack(pady=4)
 
         ttk.Button(
             eszkoz_frame,
             text="Eszközlista mentése CSV-fájlba",
             command=self.evk_eszkozok_exportalasa
-        ).pack(pady=5)
+        ).pack(pady=4)
 
         naplo_frame = ttk.LabelFrame(
             self.naplo_oldal,
@@ -323,6 +326,7 @@ class EVKEszkozNyilvantarto:
 
         naplo_bevitel = ttk.Frame(naplo_frame)
         naplo_bevitel.pack(fill="x")
+        naplo_bevitel.columnconfigure(3, weight=1)
 
         ttk.Label(naplo_bevitel, text="Dátum (ÉÉÉÉ.HH.NN.):").grid(
             row=0,
@@ -337,7 +341,7 @@ class EVKEszkozNyilvantarto:
 
         ttk.Label(naplo_bevitel, text="Leírás:").grid(row=0, column=2)
         self.leiras_mezo = ttk.Entry(naplo_bevitel, width=35)
-        self.leiras_mezo.grid(row=0, column=3, padx=5)
+        self.leiras_mezo.grid(row=0, column=3, padx=5, sticky="ew")
 
         ttk.Button(
             naplo_bevitel,
@@ -431,19 +435,19 @@ class EVKEszkozNyilvantarto:
             naplo_frame,
             text="Kijelölt naplóbejegyzés törlése",
             command=self.evk_karbantartas_torlese
-        ).pack()
+        ).pack(pady=4)
 
         ttk.Button(
             naplo_frame,
             text="Kijelölt naplóbejegyzés módosítása",
             command=self.evk_karbantartas_modositasa
-        ).pack()
+        ).pack(pady=4)
 
         ttk.Button(
             naplo_frame,
             text="Karbantartási napló mentése CSV-fájlba",
             command=self.evk_karbantartas_exportalasa
-        ).pack()
+        ).pack(pady=4)
 
     def evk_datum_atalakitasa(self, datum):
         for formatum in ("%Y.%m.%d.", "%Y.%m.%d"):
